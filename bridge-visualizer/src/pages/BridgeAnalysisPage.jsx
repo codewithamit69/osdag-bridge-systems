@@ -359,7 +359,7 @@ export default function BridgeAnalysisPage() {
             transition={{ duration: 0.55, ease: "easeOut" }}
             className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.05]"
           >
-            <span className="bg-gradient-to-r from-white via-blue-100 to-emerald-100 bg-clip-text text-transparent">
+            <span className="heading-gradient">
               Osdag-Inspired Bridge Analysis
             </span>
           </motion.h1>

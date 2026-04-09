@@ -29,7 +29,9 @@ SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-dev-key")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "True").lower() == "true"
 
-ALLOWED_HOSTS = []
+# Read ALLOWED_HOSTS from env (docker-compose sets ALLOWED_HOSTS="*")
+_allowed = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1")
+ALLOWED_HOSTS = [h.strip() for h in _allowed.split(",") if h.strip()]
 
 
 # Application definition
@@ -47,13 +49,13 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',             # Must be first for CORS preflight
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
@@ -132,3 +134,12 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
+
+# Allow all origins when running behind nginx in Docker (frontend proxies /api/)
+CORS_ALLOW_ALL_ORIGINS = os.getenv("CORS_ALLOW_ALL", "False").lower() == "true"
+
+# Safety net: redirect missing trailing slashes (won't help POST, but keeps GET clean)
+APPEND_SLASH = True
+
+# Suppress warnings about default primary key type
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
