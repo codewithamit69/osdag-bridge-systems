@@ -1,0 +1,3 @@
+span_length_m,dead_load_kN_per_m,point_load_kN,load_position_m,impact_factor,E_GPa,I_m4,section_y_m,steel_grade,V_max_expected_kN,M_max_expected_kNm
+10,10,0,0,0,200,1e-4,0.2,Fe250,50,125
+20,5,50,10,0.1,200,2e-4,0.25,Fe350,80,525

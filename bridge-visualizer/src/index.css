@@ -1,0 +1,125 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ========== THEME VARIABLES ========== */
+:root {
+  --bg-primary:     #0f1117;
+  --bg-secondary:   #1a1d2e;
+  --bg-card:        #1e2132;
+  --bg-input:       #252840;
+  --text-primary:   #ffffff;
+  --text-secondary: rgba(255,255,255,0.65);
+  --text-muted:     rgba(255,255,255,0.35);
+  --border-color:   rgba(255,255,255,0.12);
+  --accent-blue:    #3B82F6;
+  --badge-fail-bg:  rgba(220,38,38,0.25);
+  --badge-fail-text:#F87171;
+  --badge-pass-bg:  rgba(34,197,94,0.25);
+  --badge-pass-text:#4ADE80;
+  --warning-bg:     rgba(234,179,8,0.15);
+  --warning-text:   #FCD34D;
+  --graph-bg:       #0f1117;
+  --plot-paper-bg:  #0f1117;
+  --plot-grid-color:#2a2d3e;
+  --page-gradient:  radial-gradient(1200px 600px at 10% -10%, rgba(59,130,246,0.14), transparent),
+                    radial-gradient(900px 500px at 90% 0%, rgba(16,185,129,0.12), transparent),
+                    #0b1020;
+  --svg-beam:       url(#beam);
+  --svg-support:    rgba(255,255,255,0.35);
+  --svg-udl:        rgba(255,214,102,0.9);
+  --svg-bg:         rgba(255,255,255,0.02);
+}
+
+/* Light mode overrides */
+.theme-light {
+  --bg-primary:     #f0f2f5;
+  --bg-secondary:   #ffffff;
+  --bg-card:        #ffffff;
+  --bg-input:       #ffffff;
+  --text-primary:   #111827;
+  --text-secondary: #374151;
+  --text-muted:     #6B7280;
+  --border-color:   #D1D5DB;
+  --accent-blue:    #2563EB;
+  --badge-fail-bg:  #FEE2E2;
+  --badge-fail-text:#DC2626;
+  --badge-pass-bg:  #DCFCE7;
+  --badge-pass-text:#16A34A;
+  --warning-bg:     #FEF9C3;
+  --warning-text:   #92400E;
+  --graph-bg:       #ffffff;
+  --plot-paper-bg:  #ffffff;
+  --plot-grid-color:#E5E7EB;
+  --page-gradient:  radial-gradient(1200px 600px at 10% -10%, rgba(59,130,246,0.06), transparent),
+                    radial-gradient(900px 500px at 90% 0%, rgba(16,185,129,0.05), transparent),
+                    #f0f2f5;
+  --svg-support:    #374151;
+  --svg-udl:        #D97706;
+  --svg-bg:         rgba(0,0,0,0.03);
+}
+
+/* ========== GLOBAL STYLES ========== */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Help-section highlight pulse */
+@keyframes helpPulse {
+  0% { box-shadow: 0 0 0 0 rgba(120,162,255,0.45); }
+  70% { box-shadow: 0 0 0 10px rgba(120,162,255,0.0); }
+  100% { box-shadow: 0 0 0 0 rgba(120,162,255,0.0); }
+}
+
+.helpPulse {
+  animation: helpPulse 1.2s ease-out 0s 2;
+}
+
+/* Custom scrollbars */
+.toolbar-scrollbar::-webkit-scrollbar,
+.explanation-scrollbar::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+.toolbar-scrollbar::-webkit-scrollbar-track,
+.explanation-scrollbar::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.8);
+}
+
+.toolbar-scrollbar::-webkit-scrollbar-thumb,
+.explanation-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.45);
+  border-radius: 9999px;
+}
+
+/* PDF capture mode */
+.pdf-capture-mode {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+.pdf-capture-mode .plotly-graph-div {
+  background: #ffffff !important;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

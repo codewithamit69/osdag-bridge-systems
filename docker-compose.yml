@@ -1,0 +1,62 @@
+version: "3.9"
+
+services:
+  # ─── PostgreSQL Database ───
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-osdag_database_library}
+      POSTGRES_USER: ${DB_USER:-osdag_project_bridgeanalysis}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-Saiamit@036}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-osdag_project_bridgeanalysis}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── Django Backend ───
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_NAME: ${DB_NAME:-osdag_database_library}
+      DB_USER: ${DB_USER:-osdag_project_bridgeanalysis}
+      DB_PASSWORD: ${DB_PASSWORD:-Saiamit@036}
+      DB_HOST: db
+      DB_PORT: "5432"
+      SECRET_KEY: ${SECRET_KEY:-django-insecure-change-me-in-prod}
+      DEBUG: ${DEBUG:-False}
+      ALLOWED_HOSTS: "*"
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             gunicorn backend.wsgi:application
+             --bind 0.0.0.0:8000
+             --workers 3
+             --timeout 120
+             --access-logfile -"
+
+  # ─── React Frontend (nginx) ───
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+
+volumes:
+  pgdata:

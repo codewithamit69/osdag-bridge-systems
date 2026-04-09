@@ -1,0 +1,36 @@
+# ─── Backend: Django + Gunicorn ───
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# Install system dependencies for psycopg2
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends gcc libpq-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+COPY backend/requirements.txt ./requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt gunicorn
+
+# Copy backend source
+COPY backend/ ./backend/
+COPY manage.py ./manage.py
+
+# Collect static files (if any)
+RUN DJANGO_SETTINGS_MODULE=backend.settings \
+    SECRET_KEY=build-placeholder \
+    DB_NAME=placeholder \
+    DB_USER=placeholder \
+    DB_PASSWORD=placeholder \
+    python manage.py collectstatic --noinput 2>/dev/null || true
+
+EXPOSE 8000
+
+CMD ["gunicorn", "backend.wsgi:application", \
+     "--bind", "0.0.0.0:8000", \
+     "--workers", "3", \
+     "--timeout", "120", \
+     "--access-logfile", "-"]

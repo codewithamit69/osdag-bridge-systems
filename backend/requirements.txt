@@ -1,0 +1,16 @@
+# Web Framework & API
+django>=5.0
+djangorestframework
+django-cors-headers
+
+# Database (PostgreSQL)
+psycopg2-binary
+python-dotenv
+
+# Engineering & Data Science
+pandas
+numpy
+
+# Testing & Validation
+pytest
+pytest-django
