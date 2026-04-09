@@ -106,7 +106,7 @@ export default function BridgeAnalysisPage() {
   const { scrollYProgress } = useScroll();
   const progressX = useSpring(scrollYProgress, { stiffness: 120, damping: 24, mass: 0.2 });
 
-  const [apiBaseUrl] = useState("/api");
+  const [apiBaseUrl] = useState("/api/v1");
   const [formData, setFormData] = useState({ ...DEFAULT_FORM });
   const [loading, setLoading] = useState(false);
   const [warnings, setWarnings] = useState([]);

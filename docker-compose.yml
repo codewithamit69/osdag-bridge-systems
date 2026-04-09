@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_DB: ${DB_NAME:-osdag_database_library}
       POSTGRES_USER: ${DB_USER:-osdag_project_bridgeanalysis}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-Saiamit@036}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
@@ -29,10 +29,10 @@ services:
     environment:
       DB_NAME: ${DB_NAME:-osdag_database_library}
       DB_USER: ${DB_USER:-osdag_project_bridgeanalysis}
-      DB_PASSWORD: ${DB_PASSWORD:-Saiamit@036}
+      DB_PASSWORD: ${DB_PASSWORD:-changeme}
       DB_HOST: db
       DB_PORT: "5432"
-      SECRET_KEY: ${SECRET_KEY:-django-insecure-change-me-in-prod}
+      SECRET_KEY: ${SECRET_KEY:-changeme-in-production}
       DEBUG: ${DEBUG:-False}
       ALLOWED_HOSTS: "*"
       CORS_ALLOW_ALL: "true"

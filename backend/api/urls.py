@@ -1,8 +1,11 @@
 from django.urls import path
-from .views import analyze, calculate, plots
+from . import views
 
 urlpatterns = [
-    path('calculate/', calculate),
-    path('analyze/', analyze),
-    path('plots/', plots),
+    path('v1/analyze/', views.AnalyzeView.as_view()),
+    path('v1/validate/', views.ValidateInputView.as_view()),
+    path('v1/plots/', views.PlotView.as_view()),
+    path('v1/sections/', views.SectionListView.as_view()),
+    path('v1/history/', views.HistoryListView.as_view()),
+    path('v1/testcases/run/', views.RunTestSuiteView.as_view()),
 ]

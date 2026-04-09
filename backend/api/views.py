@@ -2,6 +2,7 @@ from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.views import APIView
 
 from core.solver import analyze_simply_supported_udl_point_load
 from core.validator import apply_validation_rules
@@ -343,35 +344,51 @@ def _analyze_payload(inputs: dict, warnings: list[dict]) -> dict:
     }
 
 
-@api_view(["POST"])
-def analyze(request):
-    try:
-        serializer = BridgeAnalysisRequestSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        inputs = serializer.validated_data
-        inputs, rule_warnings = apply_validation_rules(inputs)
-        warnings = serializer.get_warnings() + rule_warnings
-        return Response(_analyze_payload(inputs, warnings), status=status.HTTP_200_OK)
-    except ValidationError as e:
-        return Response({"status": "error", "message": "Validation error", "field_errors": e.detail}, status=400)
-    except Exception as e:
-        return Response({"status": "error", "message": str(e)}, status=400)
+class AnalyzeView(APIView):
+    def post(self, request):
+        try:
+            serializer = BridgeAnalysisRequestSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            inputs = serializer.validated_data
+            inputs, rule_warnings = apply_validation_rules(inputs)
+            warnings = serializer.get_warnings() + rule_warnings
+            return Response(_analyze_payload(inputs, warnings), status=status.HTTP_200_OK)
+        except ValidationError as e:
+            return Response({"status": "error", "message": "Validation error", "field_errors": e.detail}, status=400)
+        except Exception as e:
+            return Response({"status": "error", "message": str(e)}, status=400)
 
+class PlotView(APIView):
+    def post(self, request):
+        try:
+            serializer = BridgeAnalysisRequestSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            inputs = serializer.validated_data
+            inputs, _ = apply_validation_rules(inputs)
+            payload = _analyze_payload(inputs, [])
+            return Response({"status": "success", "plots": payload["data"]["plots"]}, status=status.HTTP_200_OK)
+        except ValidationError as e:
+            return Response({"status": "error", "message": "Validation error", "field_errors": e.detail}, status=400)
+        except Exception as e:
+            return Response({"status": "error", "message": str(e)}, status=400)
 
-@api_view(["POST"])
-def plots(request):
-    try:
-        serializer = BridgeAnalysisRequestSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        inputs = serializer.validated_data
-        inputs, _ = apply_validation_rules(inputs)
-        payload = _analyze_payload(inputs, [])
-        return Response({"status": "success", "plots": payload["data"]["plots"]}, status=status.HTTP_200_OK)
-    except ValidationError as e:
-        return Response({"status": "error", "message": "Validation error", "field_errors": e.detail}, status=400)
-    except Exception as e:
-        return Response({"status": "error", "message": str(e)}, status=400)
+class ValidateInputView(APIView):
+    def post(self, request):
+        try:
+            serializer = BridgeAnalysisRequestSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            return Response({"valid": True})
+        except ValidationError as e:
+            return Response({"status": "error", "message": "Validation error", "field_errors": e.detail}, status=400)
 
+class SectionListView(APIView):
+    def get(self, request):
+        return Response({"sections": []})
 
-# Backwards compatibility with previous endpoint name.
-calculate = analyze
+class HistoryListView(APIView):
+    def get(self, request):
+        return Response([])
+
+class RunTestSuiteView(APIView):
+    def post(self, request):
+        return Response({"status": "success"})

@@ -1,0 +1,34 @@
+﻿# Environment variables — never commit
+.env
+.env.*
+
+# Database
+db.sqlite3
+*.sqlite3
+
+# Planning notes
+.planning/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+*.pyc
+
+# Django
+*.log
+staticfiles/
+media/
+
+# Node / React
+node_modules/
+build/
+.npm/
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
