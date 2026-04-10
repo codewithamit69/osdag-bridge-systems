@@ -5,11 +5,11 @@
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=black)](https://reactjs.org)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat-square&logo=postgresql&logoColor=white)](https://postgresql.org)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker&logoColor=white)](https://docker.com)
-[![pytest](https://img.shields.io/badge/pytest-FOSSEE--Standard-0A9EDC?style=flat-square&logo=pytest&logoColor=white)](https://pytest.org)
+[![pytest](https://img.shields.io/badge/pytest-Data--Driven-0A9EDC?style=flat-square&logo=pytest&logoColor=white)](https://pytest.org)
 [![IS 800](https://img.shields.io/badge/IS%20800-2007%20Compliant-green?style=flat-square)](https://bis.gov.in)
 [![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
 
-> **Mission:** To bring Internship-Level Quality Assurance — the same Test-Driven Development, headless execution, and data-driven validation standards practised by FOSSEE's own selected interns — directly into a production-grade, IS 800:2007 compliant bridge beam analysis system.
+> **Mission:** A production-grade, IS 800:2007 compliant bridge beam analysis system — built around Test-Driven Development, headless execution, and data-driven validation from the ground up. Not a prototype. Not a GUI wrapper. An engineered system.
 
 ---
 
@@ -18,7 +18,7 @@
 - [What Makes This Different](#what-makes-this-different)
 - [System Architecture](#system-architecture)
 - [The Zero-Error Pipeline](#the-zero-error-pipeline)
-- [FOSSEE-Standard Testing](#fossee-standard-testing)
+- [Data-Driven Testing](#data-driven-testing)
 - [IS 800 Code Compliance](#is-800-code-compliance)
 - [Database Design](#database-design)
 - [UI/UX Engineering](#uiux-engineering)
@@ -31,16 +31,16 @@
 
 ## What Makes This Different
 
-Most bridge analysis tools stop at the GUI. OsdagBridge Systems was architected from day one around the exact engineering software quality standards that FOSSEE's own interns are tasked with implementing during their summer fellowship.
+Most bridge analysis tools stop at the GUI. OsdagBridge Systems was designed around engineering software quality standards that are rarely seen outside production environments.
 
-| Standard | What FOSSEE Interns Were Tasked With | What OsdagBridge Already Implements |
+| Capability | Typical Tools | OsdagBridge Systems |
 |---|---|---|
-| **Headless Execution** | Bypass PyQt5 GUI via YAML `.osi` input files and CLI | Full REST API — GUI is optional, all logic runs headlessly via Django endpoints |
-| **Mocking & Isolation** | `unittest.mock.MagicMock` to fake DB and dropdowns | Django Serializers decouple validation from the solver engine completely |
-| **Data-Driven Validation** | `pytest` + Excel benchmark sheets + `pytest.approx()` | `pytest` + PostgreSQL `TestCase` table + per-field tolerance constants |
-| **Tolerance Comparisons** | Engineering-grade `pytest.approx()` on SFD, BMD, deflection | `TOLERANCE` dict with separate bounds for shear (0.01 kN), moment (0.05 kN·m), deflection (0.001 mm), stress (0.1 MPa) |
-| **UI/UX Modernization** | Redesign PyQt5 layouts to be intuitive and professional | React 18 + Tailwind CSS + Framer Motion + Lucide Icons — built modern from scratch |
-| **Schema Quality** | Basic SQLite prototypes | PostgreSQL 16 with JSONB arrays, soft deletes, full audit trail, IS-code enum fields |
+| **Headless Execution** | Requires GUI to run | Full REST API — GUI is optional, all logic runs headlessly via Django endpoints |
+| **Mocking & Isolation** | Tightly coupled to UI and DB | Django Serializers decouple validation from the solver engine completely |
+| **Data-Driven Validation** | Hardcoded test values | `pytest` + PostgreSQL `TestCase` table + per-field tolerance constants |
+| **Tolerance Comparisons** | Pass/fail with no precision | `TOLERANCE` dict with separate bounds for shear (0.01 kN), moment (0.05 kN·m), deflection (0.001 mm), stress (0.1 MPa) |
+| **UI/UX** | Static forms, no feedback | React 18 + Tailwind CSS + Framer Motion — real-time validation, ghost recommendations, dark/light mode |
+| **Schema Quality** | SQLite or flat files | PostgreSQL 16 with JSONB arrays, soft deletes, full audit trail, IS-code enum fields |
 
 ---
 
@@ -164,16 +164,16 @@ if delta_max > deflection_limit:
 
 ---
 
-## FOSSEE-Standard Testing
+## Data-Driven Testing
 
-This is the exact testing methodology that FOSSEE interns spend their summer implementing. It is built in from day one here.
+Reliability is not an afterthought — it is a core architectural decision. Every calculation is verified against stored benchmark values using engineering-grade tolerance comparisons.
 
 ### Tolerance Constants
 
 ```python
 # backend/core/tests/tolerance.py
 TOLERANCE = {
-    "shear_force":      0.01,    # kN   — 1% of typical values
+    "shear_force":      0.01,    # kN
     "bending_moment":   0.05,    # kN·m
     "deflection":       0.001,   # mm
     "normal_stress":    0.1,     # MPa
@@ -182,7 +182,7 @@ TOLERANCE = {
 }
 ```
 
-### Data-Driven Test Cases (PostgreSQL-Backed)
+### PostgreSQL-Backed Test Cases
 
 Test cases live in the `test_case` table — not in Excel files, not hardcoded in Python. Each row stores inputs, hand-calculated expected outputs, and per-field tolerance overrides:
 
@@ -197,8 +197,8 @@ class TestBridgeEngine:
 
     def test_all_stored_cases(self):
         """
-        Data-driven: runs every active TestCase from PostgreSQL
-        and asserts computed == expected within FOSSEE tolerances.
+        Runs every active TestCase from PostgreSQL and asserts
+        computed == expected within defined tolerances.
         """
         for tc in TestCase.objects.filter(is_active=True):
             result = run_analysis(tc.to_input_dict())
@@ -222,10 +222,9 @@ class TestBridgeEngine:
 
 ### Headless Execution (No GUI Required)
 
-The entire calculation pipeline runs without the React frontend. The Django REST API is the headless interface — equivalent to FOSSEE's YAML `.osi` CLI approach:
+The entire calculation pipeline runs without the React frontend. The Django REST API serves as the headless interface:
 
 ```bash
-# Run a full analysis headlessly via curl
 curl -X POST http://localhost:8000/api/v1/analyze/ \
   -H "Content-Type: application/json" \
   -d '{
@@ -244,10 +243,9 @@ curl -X POST http://localhost:8000/api/v1/analyze/ \
 
 ### Mocking and Isolation
 
-The solver engine is fully decoupled from the database, serializer, and HTTP layer. It can be tested in isolation with plain Python dicts:
+The solver engine is fully decoupled from the database, serializer, and HTTP layer:
 
 ```python
-# engine is a pure function — no DB, no HTTP, no GUI
 from core.engine import run_analysis
 from unittest.mock import patch
 
@@ -266,13 +264,10 @@ def test_engine_isolated():
 docker compose exec backend pytest backend/core/tests/ -v --tb=short
 
 # Or locally with virtualenv
-cd backend
-pytest core/tests/ -v --tb=short
+cd backend && pytest core/tests/ -v --tb=short
 ```
 
 ### Live Test Suite API Endpoint
-
-The test suite can also be triggered via the UI or API — results are stored in the `validation_run` table:
 
 ```bash
 curl -X POST http://localhost:8000/api/v1/testcases/run/ \
@@ -355,14 +350,14 @@ PostgreSQL 16 with production-grade schema patterns — not SQLite, not a protot
 }
 ```
 
-**`test_case`** — PostgreSQL-backed test data (replaces Excel benchmark files):
+**`test_case`** — benchmark data replacing flat files:
 - Stores inputs + hand-calculated expected outputs + per-field tolerances
 - Seeded via `python manage.py seed_db`
 - Queried live by the pytest suite — single source of truth
 
 **`code_compliance_check`** — one row per IS clause per run, with computed value, limit, unit, and PASS/FAIL.
 
-**`validation_run`** — records every pytest execution with `results_payload` JSONB and `pass_rate`.
+**`validation_run`** — records every test execution with `results_payload` JSONB and `pass_rate`.
 
 **`steel_section`** — read-only lookup table for IS 808 sections (ISMB 200 through ISMB 600).
 
@@ -370,8 +365,8 @@ PostgreSQL 16 with production-grade schema patterns — not SQLite, not a protot
 
 ```python
 indexes = [
-    models.Index(fields=['compliance_status', 'created_at']),  # historical queries
-    models.Index(fields=['steel_grade', 'span_length']),        # engineering queries
+    models.Index(fields=['compliance_status', 'created_at']),
+    models.Index(fields=['steel_grade', 'span_length']),
 ]
 ```
 
@@ -379,7 +374,7 @@ indexes = [
 
 ## UI/UX Engineering
 
-The React frontend was designed to solve the exact UX problems that FOSSEE interns (particularly Anushka Bajpai) were assigned to fix in the legacy PyQt5 interface.
+The React frontend was built to be intuitive, informative, and responsive — not just functional.
 
 ### Key UI Features
 
@@ -387,7 +382,7 @@ The React frontend was designed to solve the exact UX problems that FOSSEE inter
 
 **Real-Time Smart Validation** — `useValidation` hook runs on every `onChange` event. Anchored field-level toast notifications with fade transitions (200ms in, 300ms out, 3s hold). Zero API calls for validation.
 
-**Ghost Recommendations** — `useRecommendations` hook computes recommended values for dependent fields (e.g. optimal `I` from span and serviceability limit) shown as translucent placeholder text. Tab-to-accept.
+**Ghost Recommendations** — `useRecommendations` hook computes recommended values for dependent fields shown as translucent placeholder text. Tab-to-accept.
 
 **Six Interactive Plots** — Shear Force, Bending Moment, Deflection, Normal Stress, Shear Stress, Load vs Deflection. Each with hover tooltips, annotated peak values, IS 800 reference lines, and color-coded compliance regions.
 
@@ -409,14 +404,13 @@ The React frontend was designed to solve the exact UX problems that FOSSEE inter
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/osdag-bridge-systems.git
+git clone https://github.com/codewithamit69/osdag-bridge-systems.git
 cd osdag-bridge-systems
 ```
 
 ### 2. Create your environment file
 
 ```bash
-# Create .env at project root
 cat > .env << EOF
 DB_NAME=osdag_database_library
 DB_USER=osdag_project_bridgeanalysis
@@ -434,7 +428,7 @@ EOF
 docker compose up -d --build
 ```
 
-This starts three containers in order:
+Starts three containers in order:
 1. PostgreSQL 16 (waits for health check)
 2. Django + Gunicorn (auto-runs `migrate` on startup)
 3. React + nginx (proxies `/api/` to Django)
@@ -444,7 +438,6 @@ First build: ~5 minutes. Subsequent builds: ~60 seconds.
 ### 4. Seed the database
 
 ```bash
-# Load IS 808 steel sections and benchmark test cases
 docker compose exec backend python manage.py seed_db
 ```
 
@@ -452,12 +445,6 @@ docker compose exec backend python manage.py seed_db
 
 ```bash
 docker compose ps
-```
-
-All three services should show `running`. Then:
-
-```bash
-# Health check
 curl http://localhost:8000/api/health/
 # Expected: {"status": "ok"}
 ```
@@ -471,19 +458,9 @@ http://localhost:3000
 ### Common Commands
 
 ```bash
-# View logs
 docker compose logs -f backend
-
-# Run test suite
 docker compose exec backend pytest backend/core/tests/ -v
-
-# Run headless analysis
-docker compose exec backend python manage.py shell
-
-# Stop everything
 docker compose down
-
-# Full reset (deletes database volume)
 docker compose down -v
 ```
 
@@ -493,7 +470,7 @@ docker compose down -v
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/health/` | Health check — confirms backend is live |
+| `GET` | `/api/health/` | Health check |
 | `POST` | `/api/v1/validate/` | Validate inputs only, no calculation |
 | `POST` | `/api/v1/analyze/` | Full analysis pipeline, returns results + session_id |
 | `POST` | `/api/v1/plots/` | Generate all six Plotly plot JSONs for a session |
@@ -529,14 +506,14 @@ osdag-bridge-systems/
 │       ├── urls.py
 │       ├── management/
 │       │   └── commands/
-│       │       └── seed_db.py    ← seeds sections + test cases
+│       │       └── seed_db.py
 │       └── tests/
-│           ├── tolerance.py      ← TOLERANCE constants
-│           ├── test_engine.py    ← data-driven pytest suite
+│           ├── tolerance.py
+│           ├── test_engine.py
 │           ├── test_validation.py
 │           └── test_api.py
 │
-└── bridge-visualizer/            ← React app
+└── bridge-visualizer/
     ├── package.json
     └── src/
         ├── components/
@@ -558,7 +535,7 @@ osdag-bridge-systems/
 
 ## Roadmap
 
-- [ ] Add continuous beam (multi-span) support
+- [ ] Continuous beam (multi-span) support
 - [ ] IRC moving load influence line diagrams
 - [ ] IS 456:2000 reinforced concrete beam analysis
 - [ ] Export test cases to CSV for offline benchmark comparison
@@ -569,13 +546,3 @@ osdag-bridge-systems/
 ## License
 
 MIT License — see [LICENSE](LICENSE) for details.
-
----
-
-<div align="center">
-
-**Built for the FOSSEE Summer Fellowship — IITB**
-
-*Demonstrating that the quality standards taught during the internship can be the foundation, not the destination.*
-
-</div>
